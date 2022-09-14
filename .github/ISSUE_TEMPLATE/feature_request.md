@@ -1,20 +1,12 @@
 ---
-name: Feature request
-about: Suggest an idea for this project
-title: ''
-labels: ''
-assignees: ''
-
+name: 🚀 功能请求 | Feature Request
+about: 请详细描述您期望的功能。 | Please describe in detail the features you expect.
+title: "🚀 一些功能。。。 | [Feature]Some feature..."
+labels: ["enhancement"]
 ---
 
-**Is your feature request related to a problem? Please describe.**
-A clear and concise description of what the problem is. Ex. I'm always frustrated when [...]
+<!-- 请在您提交期望的功能之前，回答以下这些问题。 | Please answer these questions before you submit the desired feature. -->
 
-**Describe the solution you'd like**
-A clear and concise description of what you want to happen.
+#### 您使用的场景？ | 1. Your usage scenarios?
 
-**Describe alternatives you've considered**
-A clear and concise description of any alternative solutions or features you've considered.
-
-**Additional context**
-Add any other context or screenshots about the feature request here.
+#### 您期望的结果是怎样的？ | 2. What is your expected outcome?

@@ -1,38 +1,18 @@
 ---
-name: Bug report
-about: Create a report to help us improve
-title: ''
-labels: ''
-assignees: ''
-
+name: 🐛 错误报告 | Bug Report
+about: 请详细描述您使用过程中遇到的问题。| Please describe in detail the problems you encountered in the process of using.
+title: "🐛 一些问题。。。 | [Bug] Some problem..."
+labels: ["bug"]
 ---
 
-**Describe the bug**
-A clear and concise description of what the bug is.
+<!-- 请在您提交 bug 之前，回答以下这些问题。 | Please answer these questions before you submit a bug. -->
 
-**To Reproduce**
-Steps to reproduce the behavior:
-1. Go to '...'
-2. Click on '....'
-3. Scroll down to '....'
-4. See error
+#### 您使用的版本？ | Your usage version?
 
-**Expected behavior**
-A clear and concise description of what you expected to happen.
+#### 您使用的场景？ | Your usage scenarios?
 
-**Screenshots**
-If applicable, add screenshots to help explain your problem.
+#### 您做了什么操作？ | What did you do?
 
-**Desktop (please complete the following information):**
- - OS: [e.g. iOS]
- - Browser [e.g. chrome, safari]
- - Version [e.g. 22]
+#### 您遇到了什么问题？ | What are your problems?
 
-**Smartphone (please complete the following information):**
- - Device: [e.g. iPhone6]
- - OS: [e.g. iOS8.1]
- - Browser [e.g. stock browser, safari]
- - Version [e.g. 22]
-
-**Additional context**
-Add any other context about the problem here.
+#### 您期望的结果是怎样的？ | What is your expected outcome?
