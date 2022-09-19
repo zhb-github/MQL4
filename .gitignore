@@ -1,3 +1,10 @@
 *.ex4
-
 .DS_Store
+.git
+/Files/*
+/Images/*
+/Logs/*
+/Presets/*
+/Libraries/*
+/Projects/*
+/Shared Projects/*
