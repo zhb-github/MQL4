@@ -5,7 +5,9 @@
 #property strict
 
 // enum
-enum RUN_MODE_EUNM {NormalMode, SleepMode, BuyOnlyMode, SellOnlyMode, CloseBuyMode, CloseSellMode, CloseAllMode, MinimizeBuyTpMode, MinimizeSellTpMode, MinimizeAllTpMode, SetBuyTpMode, SetSellTpMode};
+enum RUN_MODE_EUNM {NormalMode, SleepMode, BuyOnlyMode, SellOnlyMode,
+ CloseBuyMode, CloseSellMode, CloseAllMode, MinimizeBuyTpMode,
+ MinimizeSellTpMode, MinimizeAllTpMode, SetBuyTpMode, SetSellTpMode};
 enum STRATEGY_EUNM {EURUSD, GBPJPY, GBPJPYFIB, GBPJPYFIB2, EURUSD_GBPJPY};
 
 // input
@@ -242,6 +244,7 @@ class Mt {
       Layer layer = layers[ArraySize(layers)-1];
       return layer;
     }
+    // 订单最大价格
     double getMaxPrice() {
       double _maxPrice = 0;
       for(int i=0; i<ArraySize(orders); i++) {
@@ -250,6 +253,7 @@ class Mt {
       }
       return _maxPrice;
     }
+    // 订单最小价格
     double getMinPrice() {
       double maxDouble = 1.7 * MathPow(10,308);
       double _minPrice = maxDouble;
@@ -259,6 +263,7 @@ class Mt {
       }
       return _minPrice;
     }
+    // 价格间距
     double getMaxSpacing() {
       return Math::gt(minPrice, maxPrice) ? 0 : Math::sub(maxPrice, minPrice);
     }
@@ -269,8 +274,10 @@ class Mt {
       }
       return sum;
     }
-    bool isTpMissing() {
+    // 是否有设置止盈
+     bool isTpMissing() {
       for(int i=0; i<ArraySize(orders); i++) {
+        // 每一个都没有设置止盈
         if(Math::eq(orders[i].tp, 0)) return true;
       }
       return false;
@@ -281,7 +288,9 @@ class Mt {
       double lotsSum = 0;
       double spacingSum = 0;
       for(int i=0; i<ArraySize(_weights); i++) {
+        // 手数进行叠加
         lotsSum = Math::add(lotsSum, _weights[i]*unitLot);
+        // 间距进行叠加
         spacingSum = Math::add(spacingSum, _steps[i]*point);
         Layer layer = {};
         layer.level = i+1;
@@ -310,8 +319,8 @@ class Mt {
     double currentPrice;
     double maxPrice;
     double minPrice;
-    double currentSpacing;
-    double maxSpacing;
+    double currentSpacing; // 当前间距 买卖不一样
+    double maxSpacing; // 订单组内价格最大间距
     Layer currentLayer;
     Layer nextLayer;
     
@@ -352,7 +361,9 @@ class Mt {
       this.unitLot = _multiple*minLot;
       this.currentLayer=_currentLayer;
 
+	  // 当前亏损间距 大于 当前层的最大价差
       if(currentSpacing >= currentLayer.maxSpacing) {
+        // 生成下一个 层
         this.nextLayer=getLayer(currentSpacing);
       } else {
         if(currentLayer.level < ArraySize(layers)) {
@@ -366,14 +377,18 @@ class Mt {
     void tick() {
       reloadOrders();
       if(ArraySize(orders) > 0) {
+        // (买单)currentSpacing = 订单组最大价格- 当前价格   maxSpacing = 订单最大价格- 订单组最小价格
+        //(卖单)currentSpacing =  当前价格 -订单组最小价格
         if(currentSpacing >= currentLayer.maxSpacing) { // spacing up to max
           double totalLots = getTotalLots();
+          // 是否为最后一层
           if(Math::ge(currentLayer.level, layers[ArraySize(layers)-1].level)) { // lot up to limit
             // stop loss, send mail
             Print("stop loss!");
             sendMail("Alert", "stop loss!");
             if(autoSL) closeAll();
           } else {
+            // 不为最后一层 ,进行加仓
             double lots = Math::sub(nextLayer.totalLots, totalLots);
             if(Math::gt(lots, 0)) {
               // 反向加仓
@@ -382,12 +397,14 @@ class Mt {
             }
           }
         }
+        // 第一次进来
       } else {
         // 正向加仓
         if(!isSleep(config)) {
           newOrder(layers[0].totalLots);
         }
       }
+      // 计算止盈
       if(isTpMissing()) {
         updateTp(isSleep(config));
       }
@@ -395,22 +412,28 @@ class Mt {
       Tools::createLine(config.symbol, "nextOpenPrice", orderType, nextOpenPrice());
     }
 
+	// 计算均价
     double weightedAverage() {
       double denominator = 0;
       double numerator = 0;
       for(int i=0; i<ArraySize(orders); i++) {
+        // 计算总价格
         denominator = Math::add(denominator, orders[i].openPrice * orders[i].lots);
+        // 计算总手数
         numerator = Math::add(numerator, orders[i].lots);
       }
       if(numerator == 0) return 0;
+      // 平均开仓价格
       return denominator/numerator;
     }
-
+	// 设置止盈
     void updateTp(bool isMin=false) {
+        // 加载 订单
       reloadOrders();
+      // 重新设置止盈
       setTp(availableTp(calcTp(isMin)));
     }
-
+	// 设置止盈
     void setTp(double tp) {
       if(Math::ge(0, tp)) {
         printf("error setTp: tp=%g", tp);
@@ -445,6 +468,8 @@ class BuyMt : public Mt {
     double nextOpenPrice() {
       return Math::sub(maxPrice, currentLayer.maxSpacing);
     }
+
+    // 当前间距 = 订单组最大价格 - 当前价格
     double getCurrentSpacing() {
       if(ArraySize(orders) == 0) return 0;
       double spacing = Math::sub(maxPrice, currentPrice);
@@ -453,12 +478,14 @@ class BuyMt : public Mt {
     void newOrder(double lots) {
       Trade::buyMarket(config.symbol, lots, config.magicNumber);
     }
+    // 计算止盈价格 止盈价格= 均价 + (手数对应的盈利点)* point;
     double calcTp(bool isMin) {
       if(isMin) {
-        return Math::add(weightedAverage(), config.tpMargins[ArraySize(config.tpMargins)-1]*point);  
+        return Math::add(weightedAverage(), config.tpMargins[ArraySize(config.tpMargins)-1]*point);
       }
       return Math::add(weightedAverage(), config.tpMargins[currentLayer.level-1]*point);
     }
+    // 允许的赢利点
     double availableTp(double tp) {
       double minTp = Math::add(Trade::ask(config.symbol), stopLevel*point);
       return tp < minTp ? minTp : tp;
@@ -482,6 +509,7 @@ class SellMt : public Mt {
     void newOrder(double lots) {
       Trade::sellMarket(config.symbol, lots, config.magicNumber);
     };
+    // 计算止盈
     double calcTp(bool isMin) {
       if(isMin) {
         return Math::sub(weightedAverage(), config.tpMargins[ArraySize(config.tpMargins)-1]*point);  

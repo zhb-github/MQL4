@@ -92,6 +92,7 @@ void OnDeinit(const int reason)
 // 获取市场行情
 string getMarketMsg() {
 
+
 	double ma1Price = NormalizeDouble(iMA(symbol,period,ma,0,MODE_EMA,PRICE_CLOSE,1),5);
 
 	double ma2Price = NormalizeDouble(iMA(symbol,period,ma,0,MODE_EMA,PRICE_CLOSE,2),5);
