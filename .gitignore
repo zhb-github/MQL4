@@ -11,6 +11,10 @@
 mqlcache.dat
 
 
+## experts 文件
+/Experts/MACD Sample.mq4
+/Experts/Moving Average.mq4
+
 ## include 文件
 /Include/Arrays/*
 /Include/Canvas/*
