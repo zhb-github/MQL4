@@ -32,6 +32,7 @@ int init()
      iLots = Init_Lots;
      xMax_Bet_Lots = Max_Bet_Lots;
      Init_Balance = AccountBalance();//取初始账户余额
+     return 0;
  }
 
 int start(){ //提取市场信号
@@ -169,7 +170,7 @@ string ReturnMarketInfomation()
 {
      string MktInfo = "N/A";
      double MACD_0 = iMACD(NULL, 0, 10, 60, 1, PRICE_CLOSE, MODE_SIGNAL, 0);
-     double MACD_2 = iMACD(NULL, 0, 10, 60, 1, PRICE_CLOSE, MODE_SIGNAL, 10);
+     double MACD_2 = iMACD(NULL, 0, 10, 60, 1, PRICE_CLOSE, MODE_SIGNAL, 1);
      double price_0 = Close[0];
      double price_high_2 = High[2];
      double price_low_2 = Low[2];
