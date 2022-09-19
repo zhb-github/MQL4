@@ -12,14 +12,6 @@
 #property indicator_chart_window
 
 #property  indicator_buffers 4
-#property  indicator_color1  RoyalBlue
-#property  indicator_width1  1
-#property  indicator_color2  Red
-#property  indicator_width2  1
-#property  indicator_color3  RoyalBlue
-#property  indicator_width3  1
-#property  indicator_color4  Red
-#property  indicator_width4  1
 input int entrancePeriod = 20;
 input int exitPeriod = 10;
 double highEntranceBuffer[];
@@ -32,19 +24,19 @@ int OnInit()
    IndicatorDigits(Digits);
    IndicatorShortName("TimeBreak("+string(entrancePeriod)+","+string(exitPeriod)+")");
    
-   SetIndexStyle(0,DRAW_LINE);
+   SetIndexStyle(0,DRAW_LINE,STYLE_SOLID,1,RoyalBlue);
    SetIndexBuffer(0,highEntranceBuffer);
    SetIndexLabel(0,"HighEntrance("+string(entrancePeriod)+")");
    
-   SetIndexStyle(1,DRAW_LINE);
+   SetIndexStyle(1,DRAW_LINE,STYLE_SOLID,1,Red);
    SetIndexBuffer(1,lowExitBuffer);
    SetIndexLabel(1,"LowExit("+string(exitPeriod)+")");
    
-   SetIndexStyle(2,DRAW_LINE);
+   SetIndexStyle(2,DRAW_LINE,STYLE_SOLID,1,RoyalBlue);
    SetIndexBuffer(2,lowEntranceBuffer);
    SetIndexLabel(2,"LowEntrance("+string(entrancePeriod)+")");
    
-   SetIndexStyle(3,DRAW_LINE);
+   SetIndexStyle(3,DRAW_LINE,STYLE_SOLID,1,Red);
    SetIndexBuffer(3,highExitBuffer);
    SetIndexLabel(3,"HighExit("+string(exitPeriod)+")");
    
@@ -71,18 +63,6 @@ int OnCalculate(const int rates_total,
    int minPeriod=entrancePeriod<exitPeriod ? entrancePeriod : exitPeriod;
    int i=prev_calculated==0 ? minPeriod-1 : prev_calculated-1;
    for(;i<rates_total;i++) {
-      // if(i>=entrancePeriod) {
-      //    int highest=iHighest(NULL,0,MODE_CLOSE,entrancePeriod,rates_total-i);
-      //    highEntranceBuffer[i]=iHigh(NULL,0,highest);
-      //    int lowest=iLowest(NULL,0,MODE_CLOSE,entrancePeriod,rates_total-i);
-      //    lowEntranceBuffer[i]=iLow(NULL,0,lowest);
-      // }
-      // if(i>=exitPeriod) {
-      //    int lowest=iLowest(NULL,0,MODE_CLOSE,exitPeriod,rates_total-i);
-      //    lowExitBuffer[i]=iLow(NULL,0,lowest);
-      //    int highest=iHighest(NULL,0,MODE_CLOSE,exitPeriod,rates_total-i);
-      //    highExitBuffer[i]=iHigh(NULL,0,highest);
-      // }
       if(i>=entrancePeriod) {
          int highest=iHighest(NULL,0,MODE_HIGH,entrancePeriod,rates_total-i);
          highEntranceBuffer[i]=iHigh(NULL,0,highest);
