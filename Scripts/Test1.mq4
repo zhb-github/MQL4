@@ -14,7 +14,9 @@ void OnStart()
   {
 //---
    
-   testIndicatorCounted();
+//   testIndicatorCounted();
+
+   Alert(TerminalPath());
    
   }
 //+------------------------------------------------------------------+
