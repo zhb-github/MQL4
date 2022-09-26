@@ -21,7 +21,7 @@ class CIndic {
             return iMACD(NULL,_timeframe,12,26,9,PRICE_CLOSE,MODE_MAIN,_shift);
         }
 
-        double macd(int _shift=0, int _timeframe=0) {
+        double rsi(int _shift=0, int _timeframe=0) {
             return iRSI(NULL,_timeframe,14,PRICE_CLOSE,_shift);
         }
 
