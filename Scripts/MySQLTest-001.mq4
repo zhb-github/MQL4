@@ -18,12 +18,14 @@ string INI;
 void OnStart()
 {
 	int DBConnection = MySqlConnect("localhost", "root", "123456", "zhb", 3306, "", 0);
-	if (DBConnection==-1)
+	if (DBConnection== -1)
 	{
 	 Print("Error #", MySqlErrorNumber, ": ", MySqlErrorDescription);
 	 
-	}
-	else Print ("Connected!");
+	}else Print ("Connected!");
+
+
+   PrintFormat(AccountNumber());
 
 }
 //+------------------------------------------------------------------+

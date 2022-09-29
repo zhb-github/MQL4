@@ -16,8 +16,14 @@ void OnStart()
    
 //   testIndicatorCounted();
 
-   Alert(TerminalPath());
-   
+//   Alert(TerminalPath());
+
+   //Alert(AccountServer());
+
+ Alert(OrdersHistoryTotal());
+
+//    Alert(TimeGMTOffset());
+
   }
 //+------------------------------------------------------------------+
 

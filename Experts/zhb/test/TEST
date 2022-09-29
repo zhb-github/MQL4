@@ -1,0 +1,3 @@
+"INSERT INTO `trade` (`id`, `current_user_id`, `master_user_id`, `order_id`, `parent_order_id`,`group_order_id`, `symbol`, `type`, `lots`, `open_price`, `profit_price`, `stop_loss_price`, `close_price`, `open_time`, `close_time`,`commission_money`, `store_money`, `result_money`, `description`) VALUES (NULL, "
+			+userId+", '0', "+OrderTicket()+", '0', '0', "+OrderSymbol()+", "+OrderType()+", "+OrderLots()+", "+OrderOpenPrice()+", "+OrderTakeProfit()+
+			  ", "+OrderStopLoss()+", "+OrderClosePrice()+", "+OrderOpenTime()+", "+OrderCloseTime()+", "+OrderCommission()+", "+OrderSwap()+", "+OrderProfit()+", "+OrderComment()+");";
