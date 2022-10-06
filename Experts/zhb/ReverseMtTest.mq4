@@ -33,7 +33,6 @@ double exitStopLossRate = 2;
 // k线间隔
 input int period = PERIOD_D1;
 // 定时退出间隔
-input int timingExit = 60;
 const string COMMENT = "STB";
 int magicNumber = 10001;
 
@@ -50,6 +49,11 @@ input double moneyUnitRate = 100000;
 const int BLANK =1,BLANK_PROFIT=2, HALF=3, FULL =  4;
 
 double atrVal = 0;
+
+input double exitStopLossFinal = 3.0;
+input double addPositionFinal = 0.5;
+input int addPositionOrderNumRate = 2;
+input int exitStopLossOrderNumRate = 2;
 
 Order buyOrders[];
 
@@ -352,21 +356,23 @@ int OnInit() {
     return (0);
 
 }
+
+
 // 加长间距 每次加大
 void countAddPosition(){
 
 	int ordertotalNum = ArraySize(buyOrders) + ArraySize(sellOrders);
 
-	addPosition = 0.3 + (ordertotalNum/3 * 0.1);
+	addPosition = addPositionFinal + (ordertotalNum/addPositionOrderNumRate * 0.1);
 }
-
 
 void countExitStopLossRate(){
 
 	int ordertotalNum = ArraySize(buyOrders) + ArraySize(sellOrders);
 
-	exitStopLossRate = 4.0 - (ordertotalNum/2 * 0.1);
+	exitStopLossRate = exitStopLossFinal - (ordertotalNum/exitStopLossOrderNumRate * 0.1);
 
+	// 最小只减到0.2
 	if(exitStopLossRate <= 0.2){
 		exitStopLossRate =0.2;
 	}
