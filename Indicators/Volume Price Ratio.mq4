@@ -50,7 +50,7 @@ int OnCalculate(const int rates_total,
    int i=prev_calculated==0 ? 0 : prev_calculated-1;
    for(;i<rates_total;i++) {
       double priceDiff=MathAbs(open[i]-close[i]);
-      vprBuffer[i]=tick_volume[i]/(priceDiff*pow(10, Digits())+1);
+      vprBuffer[i]=tick_volume[i]/(priceDiff*pow(10, Digits())+100);
    }
    return(rates_total);
 }
