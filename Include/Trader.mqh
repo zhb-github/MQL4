@@ -1,59 +1,77 @@
 class CTrader {
     public:
-        const string SYMBOL;
         const int MAGIC_NUMBER;
-        const double MINI_LOT;
+        const string DEFAULT_COMMENT;
+        const double DEFAULT_LOT;
         int buyCount;
         int sellCount;
         double buyLot;
         double sellLot;
         
-        CTrader(int _magicNumber): SYMBOL(Symbol()), MAGIC_NUMBER(_magicNumber), MINI_LOT(miniLot()) {}
-        CTrader(string _symbol, int _magicNumber): SYMBOL(_symbol), MAGIC_NUMBER(_magicNumber), MINI_LOT(miniLot()) {}
+        CTrader(int _magicNumber): MAGIC_NUMBER(_magicNumber), DEFAULT_LOT(miniLot()) {}
+        CTrader(int _magicNumber, double _defaultLot): MAGIC_NUMBER(_magicNumber), DEFAULT_LOT(fixedLot(_defaultLot)) {}
+        CTrader(int _magicNumber, string _defaultComment): MAGIC_NUMBER(_magicNumber), DEFAULT_COMMENT(_defaultComment), DEFAULT_LOT(miniLot()) {}
+        CTrader(int _magicNumber, string _defaultComment, double _defaultLot): MAGIC_NUMBER(_magicNumber), DEFAULT_COMMENT(_defaultComment), DEFAULT_LOT(fixedLot(_defaultLot)) {}
 
+        // system functions
         double ask() {
-            return MarketInfo(SYMBOL, MODE_ASK);
+            return MarketInfo(NULL, MODE_ASK);
         }
         double bid() {
-            return MarketInfo(SYMBOL, MODE_BID);
+            return MarketInfo(NULL, MODE_BID);
         }
         double spread() {
-            return MarketInfo(SYMBOL, MODE_SPREAD);
+            return MarketInfo(NULL, MODE_SPREAD);
         }
-        double point() {
-            return MarketInfo(SYMBOL, MODE_POINT);
+        double point() { // 0.00001 for EURUSD
+            return MarketInfo(NULL, MODE_POINT);
         }
-        double digits() {
-            return MarketInfo(SYMBOL, MODE_DIGITS);
+        double digits() { // 5.0 for EURUSD
+            return MarketInfo(NULL, MODE_DIGITS);
         }
         double stopLevel() {
-            return MarketInfo(SYMBOL, MODE_STOPLEVEL);
+            return MarketInfo(NULL, MODE_STOPLEVEL);
         }
-        double miniLot() {
-            return MarketInfo(SYMBOL, MODE_MINLOT);
+        double miniLot() { // 0.01
+            return MarketInfo(NULL, MODE_MINLOT);
+        }
+
+        // utils
+        double fixedLot(double _lot) {
+            double lot=NormalizeDouble(_lot, int(-log10(miniLot())));
+            return lot<miniLot() ? miniLot() : lot;
         }
         
-        int buy(double _orderLots, double _stoploss=0, double _takeprofit=0, string _comment=NULL) {
-            if(NormalizeDouble(_orderLots, 2)==0) return 0;
-            if(NormalizeDouble(_orderLots, 2)<MINI_LOT) return 0;
-            int ticket=OrderSend(SYMBOL,OP_BUY,_orderLots,ask(),3,_stoploss,_takeprofit,_comment,MAGIC_NUMBER,0,Blue);
+        // operation functions
+        int buy(double _orderLot=0, double _stoploss=0, double _takeprofit=0, string _comment=NULL) {
+            if(_orderLot<0) {
+                printf("_orderLot must be positive: _orderLot=%g", _orderLot);
+                return 0;
+            }
+            _orderLot=_orderLot==0 ? DEFAULT_LOT : fixedLot(_orderLot);
+            if(_comment==NULL) _comment=DEFAULT_COMMENT;
+            int ticket=OrderSend(NULL,OP_BUY,_orderLot,ask(),3,_stoploss,_takeprofit,_comment,MAGIC_NUMBER,0,Blue);
             if(ticket>0) {
                 buyCount++;
-                buyLot+=_orderLots;
+                buyLot+=_orderLot;
             }
-            else printf("ticket=%i, type=buy, lots=%g, symbol=%s, price=%g, sl=%g, tp=%g, error=%i", ticket, _orderLots, SYMBOL, ask(), _stoploss, _takeprofit, GetLastError());
+            else printf("ticket=%i, type=buy, lots=%g, symbol=%s, price=%g, sl=%g, tp=%g, error=%i", ticket, _orderLot, _Symbol, ask(), _stoploss, _takeprofit, GetLastError());
             return ticket;
         }
 
-        int sell(double _orderLots, double _stoploss=0, double _takeprofit=0, string _comment=NULL) {
-            if(NormalizeDouble(_orderLots, 2)==0) return 0;
-            if(NormalizeDouble(_orderLots, 2)<MINI_LOT) return 0;
-            int ticket=OrderSend(SYMBOL,OP_SELL,_orderLots,bid(),3,_stoploss,_takeprofit,_comment,MAGIC_NUMBER,0,Red);
+        int sell(double _orderLot=0, double _stoploss=0, double _takeprofit=0, string _comment=NULL) {
+            if(_orderLot<0) {
+                printf("_orderLot must be positive: _orderLot=%g", _orderLot);
+                return 0;
+            }
+            _orderLot=_orderLot==0 ? DEFAULT_LOT : fixedLot(_orderLot);
+            if(_comment==NULL) _comment=DEFAULT_COMMENT;
+            int ticket=OrderSend(NULL,OP_SELL,_orderLot,bid(),3,_stoploss,_takeprofit,_comment,MAGIC_NUMBER,0,Red);
             if(ticket>0) {
                 sellCount++;
-                sellLot+=_orderLots;
+                sellLot+=_orderLot;
             }
-            else printf("ticket=%i, type=sell, lots=%g, symbol=%s, price=%g, sl=%g, tp=%g, error=%i", ticket, _orderLots, SYMBOL, bid(), _stoploss, _takeprofit, GetLastError());
+            else printf("ticket=%i, type=sell, lots=%g, symbol=%s, price=%g, sl=%g, tp=%g, error=%i", ticket, _orderLot, _Symbol, bid(), _stoploss, _takeprofit, GetLastError());
             return ticket;
         }
 
@@ -204,6 +222,7 @@ class CTrader {
             }
         }
 
+        // custom select
         bool selectFirstBuyOrder() {
             for(int i=0; i<OrdersTotal(); i++) {
                 if(!OrderSelect(i,SELECT_BY_POS,MODE_TRADES)) break;
