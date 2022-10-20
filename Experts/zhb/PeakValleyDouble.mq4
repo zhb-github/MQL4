@@ -10,7 +10,7 @@
 input int period  = 1440;
 input double highRsi = 65.0;
 input double lowRsi = 35.0;
-input double firstOrderAtrRate = 2.0;
+input double firstOrderAtrRate = 1.0;
 input int inteval = 55;
 input int exitInteval = 10;
 input int dayRange = 5;
@@ -129,13 +129,7 @@ void OnTick() {
             }
 		}
 
-
 	}
-
-
-
-
-
 
 }
 

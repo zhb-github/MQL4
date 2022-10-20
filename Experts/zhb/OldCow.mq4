@@ -24,6 +24,7 @@ int magicNumber = 10002;
 extern double myLots = 0.01;
 
 input int ma = 50;
+input double targetProfit = 50.0; 
 
 const string BUY = "buy", SELL = "sell", NO_MARKET = "no_market", EXIT = "exit", DO_NOTHING = "do_nothing";
 
@@ -35,6 +36,8 @@ int OnInit() {
 
 }
 
+bool disableBuy = false;
+bool disableSell = false;
 void OnTick() {
 
 
@@ -43,13 +46,15 @@ void OnTick() {
 	if(orderTotalNum == 0){
 
 		string marketMsg = getMarketMsg();
-
-		if(marketMsg == BUY){
-			Trade::buyMarket(symbol,myLots,magicNumber,COMMENT);
+		if(disableBuy == false){
+			if(marketMsg == BUY){
+				Trade::buyMarket(symbol,myLots,magicNumber,COMMENT);
+			}
 		}
-
-		if(marketMsg == SELL){
-			Trade::sellMarket(symbol,myLots,magicNumber,COMMENT);
+		if(disableSell == false){
+			if(marketMsg == SELL){
+				Trade::sellMarket(symbol,myLots,magicNumber,COMMENT);
+			}
 		}
 
 
@@ -59,7 +64,14 @@ void OnTick() {
 			return ;
 		}
 		if(OrderType() == OP_BUY){
-
+			
+			
+			if(OrderProfit() > targetProfit){
+				disableSell = false;
+				disableBuy = true;
+				OrderService::closeAllAndReturnProfit(symbol,magicNumber);
+			}
+			
 			if(getExitMarketMsg(OrderType()) == EXIT){
 				PrintFormat(" orderTotalNum : %i, marketMsg: %s",orderTotalNum,getExitMarketMsg(OrderType()));
 				OrderService::closeAllAndReturnProfit(symbol,magicNumber);
@@ -67,7 +79,12 @@ void OnTick() {
 			}
 
 		}else if(OrderType() == OP_SELL){
-
+			
+			if(OrderProfit() > targetProfit){
+                disableSell = true;
+                disableBuy = false;
+                OrderService::closeAllAndReturnProfit(symbol,magicNumber);
+            }
 			if(getExitMarketMsg(OrderType()) == EXIT){
 				PrintFormat(" orderTotalNum : %i, marketMsg: %s",orderTotalNum,getExitMarketMsg(OrderType()));
 				OrderService::closeAllAndReturnProfit(symbol,magicNumber);
@@ -102,12 +119,12 @@ string getMarketMsg() {
 	double ma4Price = NormalizeDouble(iMA(symbol,period,ma,0,MODE_EMA,PRICE_CLOSE,4),5);
 
 
-	if(ma1Price> ma2Price && ma2Price>ma3Price && ma3Price>ma4Price){
+	if(ma1Price> ma2Price && ma2Price > ma3Price && ma3Price > ma4Price){
 		PrintFormat("BUY m1: %g,m2:%g, m3: %g,m4:%g",ma1Price,ma2Price,ma3Price,ma4Price);
 		return BUY;
 	}
 
-	if(ma4Price>ma3Price && ma3Price > ma2Price && ma2Price>ma1Price){
+	if(ma4Price>ma3Price && ma3Price > ma2Price && ma2Price > ma1Price){
 		PrintFormat("SELL m1: %g,m2:%g, m3: %g,m4:%g",ma1Price,ma2Price,ma3Price,ma4Price);
 		return SELL;
 	}

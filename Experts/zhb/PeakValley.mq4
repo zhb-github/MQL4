@@ -7,17 +7,18 @@
 //+------------------------------------------------------------------+
 #include <Trader.mqh>
 
-input int period  = 1440;
-input double highRsi = 65.0;
-input double lowRsi = 35.0;
-input double firstOrderAtrRate = 2.0;
-input int inteval = 55;
+input int period  = 60;
+input int maxPeriod = 240;
+input double highRsi = 70.0;
+input double lowRsi = 30.0;
+input double firstOrderAtrRate = 1.0;
+input int inteval = 10;
 input int exitInteval = 10;
 input int dayRange = 5;
 input double addPosition = 0.5;
-input double stopLossRange = 4.0;
+input double stopLossRange = 2;
 input int atrRange = 20;
-input int rsiRange = 20;
+input int rsiRange = 3;
 input double myLots = 0.01;
 
 string symbol = Symbol();
@@ -38,13 +39,18 @@ void OnTick() {
 	// 没有订单的情况
 	if(orderTotolNum == 0){
 
-		int highBar = iHighest(symbol,period,MODE_HIGH,inteval, 0);
+		int highBar = iHighest(symbol,period,MODE_HIGH,inteval, 1);
 		double highPrice = iHigh(symbol,period,highBar);
-
 		double rsiVal = iRSI(symbol,period,rsiRange,PRICE_CLOSE,highBar);
 
-		// 天数范围
-		if(rsiVal <= lowRsi){
+		// 第一，检查大周期的趋势，大周期的趋势决定了，买卖的方向，或者是不交易， 使用macd123确定大周期的趋势，如果没有趋势，不进行交易
+
+		 double MACD_1 = iMACD(NULL, maxPeriod, 12, 26, 9, PRICE_CLOSE, MODE_MAIN, 1);
+		 double MACD_2 = iMACD(NULL, maxPeriod, 12, 26, 9, PRICE_CLOSE, MODE_MAIN, 2);
+		 double MACD_3 = iMACD(NULL, maxPeriod, 12, 26, 9, PRICE_CLOSE, MODE_MAIN, 3);
+
+		// 范围
+		if(rsiVal >= lowRsi){
 
 			if(highBar <dayRange){
 
@@ -52,6 +58,7 @@ void OnTick() {
 				// 当前价格判断
 				double operattionPrice =  ctrader.bid() +  firstOrderAtrRate * value ;
 				atrVal = value;
+				// 当前价格下跌
 				if(operattionPrice <= highPrice){
 					ctrader.sell(myLots);
 					return;
@@ -64,21 +71,22 @@ void OnTick() {
 		  int lowBar = iLowest(symbol,period,MODE_LOW,inteval,0);
           double lowPrice = iLow(symbol,period,lowBar);
 
-		if(rsiVal>= highRsi){
+		if(rsiVal <= highRsi){
+
 		  if(lowBar < dayRange){
+
 		        double value = iATR(symbol,period,atrRange,lowBar);
 		        atrVal = value;
 		        double operattionPrice =  ctrader.ask() -  firstOrderAtrRate * value ;
-
+				// 当前价格上涨
 		        if(operattionPrice >= lowPrice){
-					ctrader.buy(myLots);
-					return;
+						ctrader.buy(myLots);
+						return;
 		        }
 
 		  }
 
 		}
-
 
 	}else{
 
@@ -91,25 +99,25 @@ void OnTick() {
 				ctrader.closeBuy();
 				return;
 			}
-			// 最少超过10日
+			// 最少超过10个时间间隔
 			int bar = iBarShift(symbol,period,OrderOpenTime());
-            if(bar> exitInteval){
-
+            if(bar>= exitInteval){
 				// 计算区间最高价格
-				int highBar = iHighest(symbol,period,MODE_HIGH,exitInteval, 0);
-				double highPrice = iHigh(symbol,period,highBar);
-
-
-				if(highBar < dayRange){
-
-					double value = iATR(symbol,period,atrRange,highBar);
-		            // 当前价格判断
-		            double operattionPrice =  ctrader.bid() +  stopLossRange * value ;
-		            if(operattionPrice <= highPrice){
-		                ctrader.closeBuy();
-		            }
-
-				}
+				ctrader.closeBuy();
+//				int highBar = iHighest(symbol,period,MODE_HIGH,exitInteval, 0);
+//				double highPrice = iHigh(symbol,period,highBar);
+//
+//
+//				if(highBar < dayRange){
+//
+//					double value = iATR(symbol,period,atrRange,highBar);
+//		            // 当前价格判断
+//		            double operattionPrice =  ctrader.bid() +  stopLossRange * value ;
+//		            if(operattionPrice <= highPrice){
+//		                ctrader.closeBuy();
+//		            }
+//
+//				}
             }
 
 		}else{
@@ -120,21 +128,21 @@ void OnTick() {
             }
 			int bar = iBarShift(symbol,period,OrderOpenTime());
 
-            if(bar> exitInteval){
-
-				int lowBar = iLowest(symbol,period,MODE_LOW,exitInteval,0);
-				double lowPrice = iLow(symbol,period,lowBar);
-
-				if(lowBar < dayRange){
-
-				    double value = iATR(symbol,period,atrRange,lowBar);
-				    double operattionPrice =  ctrader.ask() -  stopLossRange * value ;
-
-				    if(operattionPrice >= lowPrice){
-				        ctrader.closeSell();
-				    }
-
-				}
+            if(bar>= exitInteval){
+				ctrader.closeSell();
+//				int lowBar = iLowest(symbol,period,MODE_LOW,exitInteval,0);
+//				double lowPrice = iLow(symbol,period,lowBar);
+//
+//				if(lowBar < dayRange){
+//
+//				    double value = iATR(symbol,period,atrRange,lowBar);
+//				    double operattionPrice =  ctrader.ask() -  stopLossRange * value ;
+//
+//				    if(operattionPrice >= lowPrice){
+//				        ctrader.closeSell();
+//				    }
+//
+//				}
 
             }
 		}

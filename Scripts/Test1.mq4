@@ -20,8 +20,12 @@ void OnStart()
 
    //Alert(AccountServer());
 
- Alert(OrdersHistoryTotal());
+// Alert(OrdersHistoryTotal());
 
+	Alert(TimeDayOfWeek(TimeCurrent()));
+
+//	int a = 0.00080 * MathPow(10,5);
+//	Alert("a: "+ a);
 //    Alert(TimeGMTOffset());
 
   }

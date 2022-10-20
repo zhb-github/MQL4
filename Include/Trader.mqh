@@ -258,6 +258,13 @@ class CTrader {
             }
             return false;
         }
+	    bool selectLastOrder() {
+            for(int i=OrdersTotal()-1; i>=0; i--) {
+                if(!OrderSelect(i,SELECT_BY_POS,MODE_TRADES)) break;
+                if(OrderMagicNumber()==MAGIC_NUMBER) return true;
+            }
+            return false;
+        }
 
         // readable
 

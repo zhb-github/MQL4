@@ -19,6 +19,8 @@ const input RUN_MODE_EUNM RUN_MODE=NormalMode;
 int orderStatus = 1;
 // 满仓数量
 input int fullNum = 4;
+// 突破时间必须在多少日之前， 比如4日之前
+input int openDayContion = 4;
 // 交易币对
 string symbol = Symbol();
 //input string symbol = Symbol();
@@ -100,6 +102,10 @@ class Handle {
 		//向上突破
 		bool breakHighPrice(int inteval) {
             int highBar = iHighest(symbol,period,MODE_HIGH,inteval, 1);
+
+            if(highBar < 4){
+                return false;
+            }
             double highPrice = iHigh(symbol,period,highBar);
 
             if(Math:: ge(MarketInfo(symbol,MODE_ASK),highPrice)){
@@ -112,6 +118,9 @@ class Handle {
         bool breakLowPrice(int inteval) {
 
             int lowBar = iLowest(symbol,period,MODE_LOW,inteval,1);
+            if(lowBar < 4){
+                return false;
+            }
             double lowPrice = iLow(symbol,period,lowBar);
             if(Math:: ge(lowPrice,MarketInfo(symbol,MODE_BID))){
                 return true;

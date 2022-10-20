@@ -60,10 +60,6 @@ int OnCalculate(const int rates_total,
 		}
 	}
 
-
-
-
-   
    return(rates_total);
 }
 //+------------------------------------------------------------------+

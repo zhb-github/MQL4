@@ -57,7 +57,7 @@ int OnCalculate(const int rates_total,
    ArraySetAsSeries(close,false);
    ArraySetAsSeries(tick_volume,false);
 
-   // printf("rates_total=%g, prev_calculated=%g", rates_total, prev_calculated);
+    printf("rates_total=%g, prev_calculated=%g", rates_total, prev_calculated);
 
    double dSmoothFactor=2.0/(1.0+maPeriod);
    int i=prev_calculated==0 ? 0 : prev_calculated-1;
