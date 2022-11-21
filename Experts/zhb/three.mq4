@@ -59,9 +59,9 @@ void OnTick() {
 		if(market == buy){
 			// 取当前rsi 值
 			double rsiVal = iRSI(NULL,secondLevelPeriod,rsiRange,PRICE_CLOSE,1);
-			double rsiVal1= iRSI(NULL,secondLevelPeriod,rsiRange,PRICE_CLOSE,2);
 
-			if(rsiVal < minRsi || rsiVal1< minRsi){
+
+			if(rsiVal < minRsi ){
 				// 当前价格大于前柱的最高价格
 				double preHighPrice = iHigh(NULL,secondLevelPeriod,1);
 				if(ctrader.bid() > preHighPrice){
@@ -73,8 +73,7 @@ void OnTick() {
 		}else if(market == sell){
 
 			double rsiVal = iRSI(NULL,secondLevelPeriod,rsiRange,PRICE_CLOSE,1);
-			double rsiVal1 = iRSI(NULL,secondLevelPeriod,rsiRange,PRICE_CLOSE,2);
-            if(rsiVal > maxRsi || rsiVal1 > maxRsi){
+            if(rsiVal > maxRsi ){
                 double preLowPrice = iLow(NULL,secondLevelPeriod,1);
                 if(ctrader.ask() < preLowPrice){
                     ctrader.sell(myLots);

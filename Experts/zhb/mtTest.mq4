@@ -13,31 +13,18 @@
 input int maxLevel = 12;
 // 最大亏损
 input double maxLoss = -1000;
-// 根据atr 设置加仓间隔， atr 越大，加仓间隔越大
-input double atrRate = 1;
+
+
 input int period = 240;
-input int atrValRange = 1;
 
-double atrVal = 0;
+input int profitParamter = 89;
 
-
-// 计算atr值
-void  initAtrVal(int bar = 1) {
-
-	double value = iATR(ctrader.SYMBOL,period,atrValRange,bar);
-    atrVal = NormalizeDouble(value,5);
-	printf("initAtrVal value: %g,   atrVal:  %g ",  value,  atrVal);
-	if (!Math:: gt(atrVal,0)){
-        printf("init AtrVal failture atrVal: %g",atrVal);
-        // 初始化atrVal失败，终止程序运行
-        ExpertRemove();
-
-    }
-    
-}
+input double spacing = 0.0070;
 
 
-CTrader ctrader("EURUSD",1009);
+
+
+CTrader ctrader(1009);
 
 int OnInit() {
 
@@ -67,7 +54,7 @@ void OnTick() {
 		if(ctrader.buyCount < maxLevel){
 			ctrader.selectLastBuyOrder();
 			// 订单价格 大于市价， 下跌
-			initAtrVal();
+
 			if((OrderOpenPrice() - ctrader.bid()) >= getSpacing()){
 				ctrader.buy(getLots(ctrader.buyCount + 1));
 			}
@@ -100,7 +87,7 @@ void OnTick() {
 		if(ctrader.sellCount < maxLevel){
 			ctrader.selectLastSellOrder();
 			//
-			initAtrVal();
+
 			if((ctrader.ask() - OrderOpenPrice()) > getSpacing()){
 				ctrader.sell(getLots(ctrader.sellCount+1));
 			}
@@ -134,12 +121,12 @@ double getLots(int level) {
 // 获取下单间距
 double getSpacing() {
 
-	return atrVal;
+	return spacing;
 }
 
 double getProfitTarget(int orderCount) {
 
-	int x =  28 - orderCount ;
+	int x =  profitParamter - orderCount ;
 
 	return ctrader.buyLot  * x;
 }
